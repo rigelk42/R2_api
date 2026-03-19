@@ -1,0 +1,9 @@
+from typing import Protocol
+
+from identity.models import CustomUser
+
+
+class IUserRepository(Protocol):
+    def get_by_id(self, user_id: int) -> CustomUser: ...
+    def get_by_email(self, email: str) -> CustomUser: ...
+    def save(self, user: CustomUser) -> CustomUser: ...

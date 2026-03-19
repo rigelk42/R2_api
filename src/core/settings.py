@@ -29,9 +29,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
-    "users",
-    "drivers",
-    "vehicles",
+    "identity",
+    "fleet",
 ]
 
 MIDDLEWARE = [
@@ -101,7 +100,7 @@ USE_TZ = True
 STATIC_ROOT = "static"
 STATIC_URL = "/static/"
 
-AUTH_USER_MODEL = "users.CustomUser"
+AUTH_USER_MODEL = "identity.CustomUser"
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
