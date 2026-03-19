@@ -46,6 +46,9 @@ class DjangoActivityEntryRepository:
             )
         )
 
+    def get_by_vehicle(self, vehicle_id: int) -> list[ActivityEntry]:
+        return list(ActivityEntry.objects.filter(vehicle_id=vehicle_id))
+
     def save(self, entry: ActivityEntry) -> ActivityEntry:
         entry.save()
         return entry

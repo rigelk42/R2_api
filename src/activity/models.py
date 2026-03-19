@@ -23,7 +23,12 @@ class ActivityEntry(models.Model):
 
     Captures the time a driver spent online (logged in and available)
     versus active (on a trip), along with base income and tips earned.
-    Only one entry is allowed per driver per platform per day.
+    Only one entry is allowed per vehicle per platform per day.
+
+    Both driver and vehicle are stored directly for query convenience;
+    the vehicle must belong to the driver (enforced at the application
+    layer). The vehicle FK cascades on deletion so entries are removed
+    when the vehicle is removed from the system.
 
     Time fields use DurationField, which accepts HH:MM:SS input and
     maps to a PostgreSQL interval column. Active time must not exceed
@@ -35,6 +40,11 @@ class ActivityEntry(models.Model):
 
     driver = models.ForeignKey(
         "fleet.Driver",
+        on_delete=models.CASCADE,
+        related_name="activity_entries",
+    )
+    vehicle = models.ForeignKey(
+        "fleet.Vehicle",
         on_delete=models.CASCADE,
         related_name="activity_entries",
     )
@@ -65,8 +75,8 @@ class ActivityEntry(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["driver", "platform", "date"],
-                name="unique_driver_platform_date",
+                fields=["vehicle", "platform", "date"],
+                name="unique_vehicle_platform_date",
             ),
             models.CheckConstraint(
                 condition=models.Q(active_time__lte=models.F("online_time")),
