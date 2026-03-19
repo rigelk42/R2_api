@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("driver_profiles", "0002_driverprofile_driver_license_and_more"),
+        ("drivers", "0002_driverprofile_driver_license_and_more"),
         ("vehicles", "0002_alter_vehicle_options_and_more"),
     ]
 
@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="vehicles",
-                to="driver_profiles.driverprofile",
+                to="drivers.driver",
             ),
         ),
         migrations.AlterField(

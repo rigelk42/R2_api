@@ -1,16 +1,24 @@
 from datetime import timedelta
 from pathlib import Path
 
+import environ
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "django-insecure-2#i7=%&mjzs#^6orszpe#66p)+&s4e!#o)$=otri(5ae1)dj7w"
+env = environ.Env(
+    DEBUG=(bool, False),
+    ALLOWED_HOSTS=(list, ["127.0.0.1", "localhost"]),
+    CORS_ORIGIN_WHITELIST=(list, ["http://localhost:4200"]),
+    DB_HOST=(str, "localhost"),
+    DB_PORT=(int, 5432),
+)
+environ.Env.read_env(BASE_DIR.parent / ".env")
 
-DEBUG = True
+SECRET_KEY = env("SECRET_KEY")
 
-ALLOWED_HOSTS = [
-    "127.0.0.1",
-    "localhost",
-]
+DEBUG = env("DEBUG")
+
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -22,7 +30,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "users",
-    "driver_profiles",
+    "drivers",
     "vehicles",
 ]
 
@@ -59,11 +67,11 @@ WSGI_APPLICATION = "core.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "ridepulse_db_dev",
-        "USER": "ridepulse_db_dev",
-        "PASSWORD": "ridepulse_db_dev",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "NAME": env("DB_NAME"),
+        "USER": env("DB_USER"),
+        "PASSWORD": env("DB_PASSWORD"),
+        "HOST": env("DB_HOST"),
+        "PORT": env("DB_PORT"),
     }
 }
 
@@ -112,8 +120,6 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_LIFETIME_LATE_USER": timedelta(days=30),
 }
 
-CORS_ORIGIN_WHITELIST = [
-    "http://localhost:4200",
-]
+CORS_ORIGIN_WHITELIST = env.list("CORS_ORIGIN_WHITELIST")
 
 CORS_ORIGIN_ALLOW_ALL = False

@@ -6,17 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("driver_profiles", "0001_initial"),
+        ("drivers", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="driverprofile",
+            model_name="driver",
             name="driver_license",
             field=models.CharField(blank=True, max_length=16),
         ),
         migrations.AddField(
-            model_name="driverprofile",
+            model_name="driver",
             name="driver_license_state",
             field=models.CharField(blank=True, max_length=2),
         ),

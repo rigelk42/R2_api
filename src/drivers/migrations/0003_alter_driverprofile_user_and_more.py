@@ -8,13 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("driver_profiles", "0002_driverprofile_driver_license_and_more"),
+        ("drivers", "0002_driverprofile_driver_license_and_more"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="driverprofile",
+            model_name="driver",
             name="user",
             field=models.OneToOneField(
                 on_delete=django.db.models.deletion.CASCADE,
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddConstraint(
-            model_name="driverprofile",
+            model_name="driver",
             constraint=models.UniqueConstraint(
                 condition=models.Q(("driver_license__gt", "")),
                 fields=("driver_license", "driver_license_state"),
@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddConstraint(
-            model_name="driverprofile",
+            model_name="driver",
             constraint=models.CheckConstraint(
                 condition=models.Q(
                     models.Q(("driver_license", ""), ("driver_license_state", "")),

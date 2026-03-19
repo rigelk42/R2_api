@@ -3,7 +3,7 @@ import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from driver_profiles.models import DriverProfile
+from drivers.models import Driver
 
 
 class Vehicle(models.Model):
@@ -26,7 +26,7 @@ class Vehicle(models.Model):
     color = models.CharField(max_length=32)
     created_at = models.DateTimeField(auto_now_add=True)
     driver_profile = models.ForeignKey(
-        DriverProfile, on_delete=models.CASCADE, related_name="vehicles"
+        Driver, on_delete=models.CASCADE, related_name="vehicles"
     )
     make = models.CharField(max_length=32)
     model = models.CharField(max_length=32)

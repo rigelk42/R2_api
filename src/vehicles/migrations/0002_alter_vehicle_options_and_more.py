@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("driver_profiles", "0002_driverprofile_driver_license_and_more"),
+        ("drivers", "0002_driverprofile_driver_license_and_more"),
         ("vehicles", "0001_initial"),
     ]
 

@@ -3,7 +3,7 @@ from django.db import models
 from users.models import CustomUser
 
 
-class DriverProfile(models.Model):
+class Driver(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
