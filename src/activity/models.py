@@ -85,4 +85,11 @@ class ActivityEntry(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f"{self.driver} — {self.platform} — {self.date}"
+        user = self.driver.user
+        v = self.vehicle
+        return (
+            f"{user.surnames}, {user.given_names}"
+            f" - {v.year} {v.make} {v.model}"
+            f" - {self.platform}"
+            f" - {self.date}"
+        )

@@ -14,6 +14,7 @@ class Migration(migrations.Migration):
             model_name="activityentry",
             name="vehicle",
             field=models.ForeignKey(
+                default=1,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="activity_entries",
                 to="fleet.vehicle",
