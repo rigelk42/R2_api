@@ -10,7 +10,7 @@ import datetime
 from activity.models import ActivityEntry, Platform
 
 
-class DjangoPlatformRepository:
+class PlatformRepository:
     """IPlatformRepository backed by the Django ORM."""
 
     def get_by_id(self, platform_id: int) -> Platform:
@@ -23,7 +23,7 @@ class DjangoPlatformRepository:
         return list(Platform.objects.all())
 
 
-class DjangoActivityEntryRepository:
+class ActivityEntryRepository:
     """IActivityEntryRepository backed by the Django ORM."""
 
     def get_by_id(self, entry_id: int) -> ActivityEntry:

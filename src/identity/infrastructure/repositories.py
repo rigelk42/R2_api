@@ -8,7 +8,7 @@ that issues database queries for user accounts directly.
 from identity.models import CustomUser
 
 
-class DjangoUserRepository:
+class UserRepository:
     """IUserRepository backed by the Django ORM."""
 
     def get_by_id(self, user_id: int) -> CustomUser:

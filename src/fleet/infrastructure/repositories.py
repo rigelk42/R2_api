@@ -8,7 +8,7 @@ that issues database queries directly.
 from fleet.models import Driver, Vehicle
 
 
-class DjangoDriverRepository:
+class DriverRepository:
     """IDriverRepository backed by the Django ORM."""
 
     def get_by_id(self, driver_id: int) -> Driver:
@@ -22,7 +22,7 @@ class DjangoDriverRepository:
         return driver
 
 
-class DjangoVehicleRepository:
+class VehicleRepository:
     """IVehicleRepository backed by the Django ORM."""
 
     def get_by_id(self, vehicle_id: int) -> Vehicle:
