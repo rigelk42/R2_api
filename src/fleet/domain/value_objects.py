@@ -1,8 +1,21 @@
+"""Value objects for the fleet bounded context.
+
+Value objects are immutable and defined entirely by their attributes.
+Two instances with the same attributes are equal. Each class enforces
+its own invariants in __post_init__, making invalid states unrepresentable.
+"""
+
 from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
 class DriverLicense:
+    """A driver's license identified by number and issuing state.
+
+    Both fields must be non-empty; a partial license (number without
+    state, or vice versa) is not a valid domain concept.
+    """
+
     number: str
     state: str
 
@@ -13,6 +26,11 @@ class DriverLicense:
 
 @dataclass(frozen=True)
 class LicensePlate:
+    """A vehicle license plate identified by plate number and issuing state.
+
+    Both fields must be non-empty; a partial plate is not valid.
+    """
+
     plate: str
     state: str
 
@@ -23,6 +41,13 @@ class LicensePlate:
 
 @dataclass(frozen=True)
 class VehicleYear:
+    """The model year of a vehicle.
+
+    Accepted range: up to 15 years in the past through 1 year in the
+    future relative to the current calendar year. This mirrors the
+    validator range enforced on the Vehicle ORM model.
+    """
+
     value: int
 
     def __post_init__(self):

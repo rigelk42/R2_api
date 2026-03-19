@@ -1,7 +1,16 @@
+"""Django ORM implementations of the fleet repository interfaces.
+
+These classes satisfy the contracts defined in fleet.domain.repositories
+using Django's ORM. They are the only place in the fleet bounded context
+that issues database queries directly.
+"""
+
 from fleet.models import Driver, Vehicle
 
 
 class DjangoDriverRepository:
+    """IDriverRepository backed by the Django ORM."""
+
     def get_by_id(self, driver_id: int) -> Driver:
         return Driver.objects.get(pk=driver_id)
 
@@ -14,6 +23,8 @@ class DjangoDriverRepository:
 
 
 class DjangoVehicleRepository:
+    """IVehicleRepository backed by the Django ORM."""
+
     def get_by_id(self, vehicle_id: int) -> Vehicle:
         return Vehicle.objects.get(pk=vehicle_id)
 
