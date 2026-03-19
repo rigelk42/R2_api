@@ -27,8 +27,7 @@ class VehicleYear:
 
     def __post_init__(self):
         import datetime
+
         current_year = datetime.date.today().year
         if not (current_year - 15 <= self.value <= current_year + 1):
-            raise ValueError(
-                f"Vehicle year {self.value} is outside the allowed range."
-            )
+            raise ValueError(f"Vehicle year {self.value} is outside the allowed range.")

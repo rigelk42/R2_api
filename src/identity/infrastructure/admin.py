@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from identity.infrastructure.forms import CustomUserChangeForm, CustomUserCreationForm
+from identity.infrastructure.forms import (CustomUserChangeForm,
+                                           CustomUserCreationForm)
 from identity.models import CustomUser
 
 

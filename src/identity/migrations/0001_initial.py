@@ -54,7 +54,9 @@ class Migration(migrations.Migration):
                         (
                             "email",
                             models.EmailField(
-                                max_length=254, unique=True, verbose_name="email address"
+                                max_length=254,
+                                unique=True,
+                                verbose_name="email address",
                             ),
                         ),
                         ("is_staff", models.BooleanField(default=False)),
