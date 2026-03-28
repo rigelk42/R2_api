@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 from rest_framework_simplejwt import views as jwt_views
 
 urlpatterns = [
@@ -12,4 +12,10 @@ urlpatterns = [
     path(
         "api/token/refresh/", jwt_views.TokenRefreshView.as_view(), name="token_refresh"
     ),
+    path(
+        "api/token/blacklist/",
+        jwt_views.TokenBlacklistView.as_view(),
+        name="token_blacklist",
+    ),
+    path("api/", include("identity.interfaces.api.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

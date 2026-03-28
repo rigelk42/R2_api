@@ -1,3 +1,5 @@
 from django.urls import path
 
-urlpatterns = []
+from identity.interfaces.api.views import SignupView
+
+urlpatterns = [path("signup/", SignupView.as_view(), name="signup")]

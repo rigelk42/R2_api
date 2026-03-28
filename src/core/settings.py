@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
     DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, ["127.0.0.1", "localhost"]),
-    CORS_ORIGIN_WHITELIST=(list, ["http://localhost:4200"]),
+    CORS_ORIGIN_WHITELIST=(list, ["http://localhost:5173"]),
     DB_HOST=(str, "localhost"),
     DB_PORT=(int, 5432),
 )
@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "identity",
     "fleet",
     "activity",
