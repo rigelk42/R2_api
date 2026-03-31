@@ -6,6 +6,12 @@ from identity.models import CustomUser
 
 
 class CustomUserAdmin(UserAdmin):
+    """Django admin configuration for CustomUser.
+
+    Replaces the default username-centric layout with email-based
+    authentication fields and surfaces given_names/surnames throughout
+    the list view, search, and edit forms.
+    """
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = CustomUser

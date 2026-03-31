@@ -1,1 +1,1 @@
-# API views for the activity bounded context.
+"""API views for the activity bounded context."""

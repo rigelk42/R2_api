@@ -1,3 +1,9 @@
+"""WSGI entrypoint for the RidePulse API.
+
+Exposes the WSGI callable as ``application`` for use by WSGI servers
+such as Gunicorn.
+"""
+
 import os
 
 from django.core.wsgi import get_wsgi_application

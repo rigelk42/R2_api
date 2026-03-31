@@ -1,1 +1,1 @@
-# DRF serializers for the fleet bounded context.
+"""DRF serializers for the fleet bounded context."""

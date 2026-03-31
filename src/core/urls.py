@@ -1,3 +1,9 @@
+"""Root URL configuration for the RidePulse API.
+
+Mounts the Django admin, JWT token endpoints (obtain / refresh / blacklist),
+and all bounded-context API routes under the /api/ prefix.
+"""
+
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin

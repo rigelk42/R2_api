@@ -1,1 +1,1 @@
-# API views for the fleet bounded context.
+"""API views for the fleet bounded context."""
