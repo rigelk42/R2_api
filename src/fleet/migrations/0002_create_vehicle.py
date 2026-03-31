@@ -15,7 +15,29 @@ class Migration(migrations.Migration):
         migrations.SeparateDatabaseAndState(
             database_operations=[
                 migrations.RunSQL(
-                    "ALTER TABLE IF EXISTS vehicles_vehicle RENAME TO fleet_vehicle;",
+                    """
+                    DO $$
+                    BEGIN
+                        IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'vehicles_vehicle') THEN
+                            ALTER TABLE vehicles_vehicle RENAME TO fleet_vehicle;
+                        ELSIF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'fleet_vehicle') THEN
+                            CREATE TABLE fleet_vehicle (
+                                id BIGSERIAL PRIMARY KEY,
+                                color VARCHAR(16) NOT NULL,
+                                created_at TIMESTAMPTZ NOT NULL,
+                                make VARCHAR(32) NOT NULL,
+                                model VARCHAR(32) NOT NULL,
+                                plate VARCHAR(9) NOT NULL,
+                                state VARCHAR(2) NOT NULL,
+                                updated_at TIMESTAMPTZ NOT NULL,
+                                vin VARCHAR(17) NOT NULL,
+                                year INTEGER NOT NULL,
+                                user_id BIGINT NOT NULL REFERENCES fleet_driver(id) ON DELETE CASCADE,
+                                CONSTRAINT unique_plate_state UNIQUE (plate, state)
+                            );
+                        END IF;
+                    END $$;
+                    """,
                     reverse_sql="ALTER TABLE IF EXISTS fleet_vehicle RENAME TO vehicles_vehicle;",
                 ),
             ],

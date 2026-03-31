@@ -18,7 +18,21 @@ class Migration(migrations.Migration):
         migrations.SeparateDatabaseAndState(
             database_operations=[
                 migrations.RunSQL(
-                    "ALTER TABLE IF EXISTS drivers_driver RENAME TO fleet_driver;",
+                    """
+                    DO $$
+                    BEGIN
+                        IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'drivers_driver') THEN
+                            ALTER TABLE drivers_driver RENAME TO fleet_driver;
+                        ELSIF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'fleet_driver') THEN
+                            CREATE TABLE fleet_driver (
+                                id BIGSERIAL PRIMARY KEY,
+                                created_at TIMESTAMPTZ NOT NULL,
+                                updated_at TIMESTAMPTZ NOT NULL,
+                                user_id INTEGER NOT NULL REFERENCES identity_customuser(id) DEFERRABLE INITIALLY DEFERRED
+                            );
+                        END IF;
+                    END $$;
+                    """,
                     reverse_sql="ALTER TABLE IF EXISTS fleet_driver RENAME TO drivers_driver;",
                 ),
             ],

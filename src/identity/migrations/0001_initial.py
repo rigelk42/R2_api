@@ -16,7 +16,39 @@ class Migration(migrations.Migration):
         migrations.SeparateDatabaseAndState(
             database_operations=[
                 migrations.RunSQL(
-                    "ALTER TABLE IF EXISTS users_customuser RENAME TO identity_customuser;",
+                    """
+                    DO $$
+                    BEGIN
+                        IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'users_customuser') THEN
+                            ALTER TABLE users_customuser RENAME TO identity_customuser;
+                            ALTER TABLE IF EXISTS users_customuser_groups RENAME TO identity_customuser_groups;
+                            ALTER TABLE IF EXISTS users_customuser_user_permissions RENAME TO identity_customuser_user_permissions;
+                        ELSIF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'identity_customuser') THEN
+                            CREATE TABLE identity_customuser (
+                                id BIGSERIAL PRIMARY KEY,
+                                password VARCHAR(128) NOT NULL,
+                                last_login TIMESTAMPTZ NULL,
+                                is_superuser BOOLEAN NOT NULL DEFAULT FALSE,
+                                email VARCHAR(254) NOT NULL UNIQUE,
+                                is_staff BOOLEAN NOT NULL DEFAULT FALSE,
+                                is_active BOOLEAN NOT NULL DEFAULT TRUE,
+                                date_joined TIMESTAMPTZ NOT NULL
+                            );
+                            CREATE TABLE identity_customuser_groups (
+                                id BIGSERIAL PRIMARY KEY,
+                                customuser_id BIGINT NOT NULL REFERENCES identity_customuser(id) DEFERRABLE INITIALLY DEFERRED,
+                                group_id INT NOT NULL REFERENCES auth_group(id) DEFERRABLE INITIALLY DEFERRED,
+                                UNIQUE (customuser_id, group_id)
+                            );
+                            CREATE TABLE identity_customuser_user_permissions (
+                                id BIGSERIAL PRIMARY KEY,
+                                customuser_id BIGINT NOT NULL REFERENCES identity_customuser(id) DEFERRABLE INITIALLY DEFERRED,
+                                permission_id INT NOT NULL REFERENCES auth_permission(id) DEFERRABLE INITIALLY DEFERRED,
+                                UNIQUE (customuser_id, permission_id)
+                            );
+                        END IF;
+                    END $$;
+                    """,
                     reverse_sql="ALTER TABLE IF EXISTS identity_customuser RENAME TO users_customuser;",
                 ),
             ],
