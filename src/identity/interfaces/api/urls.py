@@ -1,5 +1,8 @@
 from django.urls import path
 
-from identity.interfaces.api.views import SignupView
+from identity.interfaces.api.views import SignupView, UserProfileView
 
-urlpatterns = [path("signup/", SignupView.as_view(), name="signup")]
+urlpatterns = [
+    path("signup/", SignupView.as_view(), name="signup"),
+    path("me/", UserProfileView.as_view(), name="user-profile"),
+]

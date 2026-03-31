@@ -3,7 +3,7 @@
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
-from identity.application.use_cases import RegisterUser
+from identity.application.use_cases import RegisterUser, UpdateUser
 
 
 class SignupSerializer(serializers.Serializer):
@@ -26,3 +26,12 @@ class SignupSerializer(serializers.Serializer):
     def create(self, validated_data):
         """Invoke the RegisterUser use case with the validated field values."""
         return RegisterUser().execute(**validated_data)
+
+
+class UpdateUserSerializer(serializers.Serializer):
+    email = serializers.EmailField(read_only=True)
+    given_names = serializers.CharField()
+    surnames = serializers.CharField()
+
+    def update(self, instance, validated_data):
+        return UpdateUser().execute(instance, **validated_data)

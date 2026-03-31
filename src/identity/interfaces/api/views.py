@@ -1,11 +1,12 @@
 """API views for the identity bounded context."""
 
 from rest_framework import status
-from rest_framework.generics import CreateAPIView
-from rest_framework.permissions import AllowAny
+from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from identity.interfaces.api.serializers import SignupSerializer
+from identity.interfaces.api.serializers import (SignupSerializer,
+                                                 UpdateUserSerializer)
 
 
 class SignupView(CreateAPIView):
@@ -25,3 +26,12 @@ class SignupView(CreateAPIView):
         return Response(
             {"detail": "Account created successfully"}, status=status.HTTP_201_CREATED
         )
+
+
+class UserProfileView(RetrieveUpdateAPIView):
+    serializer_class = UpdateUserSerializer
+    permission_classes = [IsAuthenticated]
+    http_method_names = ["get", "patch"]
+
+    def get_object(self):
+        return self.request.user

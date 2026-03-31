@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from identity.infrastructure.forms import CustomUserChangeForm, CustomUserCreationForm
+from identity.infrastructure.forms import (CustomUserChangeForm,
+                                           CustomUserCreationForm)
 from identity.models import CustomUser
 
 
@@ -12,6 +13,7 @@ class CustomUserAdmin(UserAdmin):
     authentication fields and surfaces given_names/surnames throughout
     the list view, search, and edit forms.
     """
+
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = CustomUser

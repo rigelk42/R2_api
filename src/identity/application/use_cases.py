@@ -42,3 +42,12 @@ class RegisterUser:
             Driver.objects.create(user=custom_user)
 
         return custom_user
+
+
+class UpdateUser:
+    def execute(self, user: CustomUser, given_names: str, surnames: str) -> CustomUser:
+        user.given_names = given_names
+        user.surnames = surnames
+        user.save(update_fields=["given_names", "surnames"])
+
+        return user

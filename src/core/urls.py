@@ -24,4 +24,5 @@ urlpatterns = [
         name="token_blacklist",
     ),
     path("api/", include("identity.interfaces.api.urls")),
+    path("api/", include("fleet.interfaces.api.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
