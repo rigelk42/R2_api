@@ -1,5 +1,7 @@
 """API views for the activity bounded context."""
 
+from datetime import date
+
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -27,7 +29,15 @@ class ActivityEntryListCreateView(APIView):
 
     def get(self, request):
         driver = request.user.driver_profile
-        entries = driver.activity_entries.all()
+        month_param = request.query_params.get("month")
+
+        if month_param:
+            year, month = (int(part) for part in month_param.split("-"))
+        else:
+            today = date.today()
+            year, month = today.year, today.month
+
+        entries = driver.activity_entries.filter(date__year=year, date__month=month)
 
         return Response(ActivityEntrySerializer(entries, many=True).data)
 
