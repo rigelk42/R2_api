@@ -4,7 +4,7 @@ Each use case class orchestrates domain logic and persistence
 without leaking infrastructure concerns into the domain.
 """
 
-from activity.models import ActivityEntry
+from activity.models import ActivityEntry, MileageEntry
 
 
 class CreateActivityEntry:
@@ -64,3 +64,28 @@ class UpdateActivityEntry:
 class DeleteActivityEntry:
     def execute(self, activity_entry: ActivityEntry):
         activity_entry.delete()
+
+
+class CreateMileageEntry:
+    def execute(self, driver, month: str, miles, deduction) -> MileageEntry:
+        entry = MileageEntry(
+            driver=driver, month=month, miles=miles, deduction=deduction
+        )
+        entry.save()
+        return entry
+
+
+class UpdateMileageEntry:
+    def execute(
+        self, entry: MileageEntry, month: str, miles, deduction
+    ) -> MileageEntry:
+        entry.month = month
+        entry.miles = miles
+        entry.deduction = deduction
+        entry.save(update_fields=["month", "miles", "deduction"])
+        return entry
+
+
+class DeleteMileageEntry:
+    def execute(self, entry: MileageEntry) -> None:
+        entry.delete()

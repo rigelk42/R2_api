@@ -3,8 +3,10 @@
 from rest_framework import serializers
 
 from activity.application.use_cases import (CreateActivityEntry,
-                                            UpdateActivityEntry)
-from activity.models import Platform
+                                            CreateMileageEntry,
+                                            UpdateActivityEntry,
+                                            UpdateMileageEntry)
+from activity.models import MileageEntry, Platform
 
 
 class PlatformSerializer(serializers.Serializer):
@@ -79,4 +81,45 @@ class ActivityEntryWriteSerializer(serializers.Serializer):
             active_time=validated_data["active_time"],
             income=validated_data["income"],
             tips=validated_data["tips"],
+        )
+
+
+class MileageEntrySerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    month = serializers.CharField(read_only=True)
+    miles = serializers.DecimalField(max_digits=8, decimal_places=1, read_only=True)
+    deduction = serializers.DecimalField(max_digits=8, decimal_places=2, read_only=True)
+
+
+class MileageEntryWriteSerializer(serializers.Serializer):
+    month = serializers.RegexField(r"^\d{4}-\d{2}$")
+    miles = serializers.DecimalField(max_digits=8, decimal_places=1)
+    deduction = serializers.DecimalField(max_digits=8, decimal_places=2)
+
+    def validate(self, data):
+        driver = self.context["request"].user.driver_profile
+        qs = MileageEntry.objects.filter(driver=driver, month=data["month"])
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError(
+                {"month": "A mileage entry for this month already exists."}
+            )
+        return data
+
+    def create(self, validated_data):
+        driver = self.context["request"].user.driver_profile
+        return CreateMileageEntry().execute(
+            driver=driver,
+            month=validated_data["month"],
+            miles=validated_data["miles"],
+            deduction=validated_data["deduction"],
+        )
+
+    def update(self, instance, validated_data):
+        return UpdateMileageEntry().execute(
+            entry=instance,
+            month=validated_data["month"],
+            miles=validated_data["miles"],
+            deduction=validated_data["deduction"],
         )

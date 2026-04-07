@@ -7,7 +7,7 @@ that issues database queries directly.
 
 import datetime
 
-from activity.models import ActivityEntry, Platform
+from activity.models import ActivityEntry, MileageEntry, Platform
 
 
 class PlatformRepository:
@@ -54,4 +54,24 @@ class ActivityEntryRepository:
         return entry
 
     def delete(self, entry: ActivityEntry) -> None:
+        entry.delete()
+
+
+class MileageEntryRepository:
+    """IMileageEntryRepository backed by the Django ORM."""
+
+    def get_by_id(self, entry_id: int) -> MileageEntry:
+        return MileageEntry.objects.get(pk=entry_id)
+
+    def get_by_driver(self, driver_id: int) -> list[MileageEntry]:
+        return list(MileageEntry.objects.filter(driver_id=driver_id))
+
+    def get_by_driver_and_month(self, driver_id: int, month: str) -> list[MileageEntry]:
+        return list(MileageEntry.objects.filter(driver_id=driver_id, month=month))
+
+    def save(self, entry: MileageEntry) -> MileageEntry:
+        entry.save()
+        return entry
+
+    def delete(self, entry: MileageEntry) -> None:
         entry.delete()

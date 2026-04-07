@@ -93,3 +93,47 @@ class ActivityEntry(models.Model):
             f" - {self.platform}"
             f" - {self.date}"
         )
+
+
+class MileageEntry(models.Model):
+    """Monthly mileage log for a driver.
+
+    Records the total miles driven in a given month and the corresponding
+    tax deduction amount in USD. Only one entry is allowed per driver per
+    month (enforced by the unique constraint on driver + month).
+
+    The month field stores a YYYY-MM string (e.g. "2025-01") to avoid
+    ambiguity when storing a partial date.
+    """
+
+    driver = models.ForeignKey(
+        "fleet.Driver",
+        on_delete=models.CASCADE,
+        related_name="mileage_entries",
+    )
+    month = models.CharField(
+        max_length=7,
+        help_text="Month this entry covers, in YYYY-MM format.",
+    )
+    miles = models.DecimalField(
+        max_digits=8,
+        decimal_places=1,
+        help_text="Total miles driven during the month.",
+    )
+    deduction = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        help_text="Tax deduction amount for the miles driven, in USD.",
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["driver", "month"],
+                name="unique_driver_month_mileage",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        user = self.driver.user
+        return f"{user.surnames}, {user.given_names} - {self.month}"
