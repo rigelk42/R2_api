@@ -10,12 +10,16 @@ from activity.models import MileageEntry, Platform
 
 
 class PlatformSerializer(serializers.Serializer):
+    """Read-only serializer for displaying platform data in API responses."""
+
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(read_only=True)
     slug = serializers.SlugField(read_only=True)
 
 
 class ActivityEntrySerializer(serializers.Serializer):
+    """Read-only serializer for displaying activity entry data in API responses."""
+
     id = serializers.IntegerField(read_only=True)
     vehicle_id = serializers.IntegerField(read_only=True)
     platform_id = serializers.IntegerField(read_only=True)
@@ -29,6 +33,13 @@ class ActivityEntrySerializer(serializers.Serializer):
 
 
 class ActivityEntryWriteSerializer(serializers.Serializer):
+    """Validates and processes activity entry create/update input.
+
+    Enforces that the referenced vehicle belongs to the requesting driver
+    and that active_time does not exceed online_time. Delegates persistence
+    to CreateActivityEntry or UpdateActivityEntry depending on context.
+    """
+
     vehicle_id = serializers.IntegerField()
     platform_id = serializers.IntegerField()
     date = serializers.DateField()
@@ -40,6 +51,7 @@ class ActivityEntryWriteSerializer(serializers.Serializer):
     )
 
     def validate(self, data):
+        """Ensure the vehicle belongs to the driver and active_time <= online_time."""
         driver = self.context["request"].user.driver_profile
 
         if not driver.vehicles.filter(pk=data["vehicle_id"]).exists():
@@ -52,6 +64,7 @@ class ActivityEntryWriteSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
+        """Invoke CreateActivityEntry for the authenticated driver."""
         driver = self.context["request"].user.driver_profile
         vehicle = driver.vehicles.get(pk=validated_data["vehicle_id"])
         platform = Platform.objects.get(pk=validated_data["platform_id"])
@@ -68,6 +81,7 @@ class ActivityEntryWriteSerializer(serializers.Serializer):
         )
 
     def update(self, instance, validated_data):
+        """Invoke UpdateActivityEntry on the existing activity entry instance."""
         driver = self.context["request"].user.driver_profile
         vehicle = driver.vehicles.get(pk=validated_data["vehicle_id"])
         platform = Platform.objects.get(pk=validated_data["platform_id"])
@@ -85,6 +99,8 @@ class ActivityEntryWriteSerializer(serializers.Serializer):
 
 
 class MileageEntrySerializer(serializers.Serializer):
+    """Read-only serializer for displaying mileage entry data in API responses."""
+
     id = serializers.IntegerField(read_only=True)
     month = serializers.CharField(read_only=True)
     miles = serializers.DecimalField(max_digits=8, decimal_places=1, read_only=True)
@@ -92,11 +108,18 @@ class MileageEntrySerializer(serializers.Serializer):
 
 
 class MileageEntryWriteSerializer(serializers.Serializer):
+    """Validates and processes mileage entry create/update input.
+
+    Enforces that only one entry exists per driver per month and delegates
+    persistence to CreateMileageEntry or UpdateMileageEntry.
+    """
+
     month = serializers.RegexField(r"^\d{4}-\d{2}$")
     miles = serializers.DecimalField(max_digits=8, decimal_places=1)
     deduction = serializers.DecimalField(max_digits=8, decimal_places=2)
 
     def validate(self, data):
+        """Ensure no other mileage entry exists for this driver and month."""
         driver = self.context["request"].user.driver_profile
         qs = MileageEntry.objects.filter(driver=driver, month=data["month"])
         if self.instance:
@@ -108,6 +131,7 @@ class MileageEntryWriteSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
+        """Invoke CreateMileageEntry for the authenticated driver."""
         driver = self.context["request"].user.driver_profile
         return CreateMileageEntry().execute(
             driver=driver,
@@ -117,6 +141,7 @@ class MileageEntryWriteSerializer(serializers.Serializer):
         )
 
     def update(self, instance, validated_data):
+        """Invoke UpdateMileageEntry on the existing mileage entry instance."""
         return UpdateMileageEntry().execute(
             entry=instance,
             month=validated_data["month"],

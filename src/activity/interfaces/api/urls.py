@@ -1,3 +1,5 @@
+"""URL routes for the activity bounded context."""
+
 from django.urls import path
 
 from activity.interfaces.api.views import (ActivityEntryDetailView,

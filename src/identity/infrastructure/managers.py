@@ -9,6 +9,16 @@ class CustomUserManager(BaseUserManager):
     """
 
     def create_user(self, email, password, **extra_fields):
+        """Create, save, and return a regular (non-staff) user.
+
+        Args:
+            email: The user's email address; used as the login identifier.
+            password: Plain-text password; hashed before storage.
+            **extra_fields: Additional model fields (e.g. given_names, surnames).
+
+        Raises:
+            ValueError: If email is not provided.
+        """
         if not email:
             raise ValueError(_("The Email must be set"))
         email = self.normalize_email(email)
@@ -18,6 +28,19 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password, **extra_fields):
+        """Create, save, and return a superuser with all permissions.
+
+        Defaults is_staff, is_superuser, and is_active to True. Raises
+        if the caller explicitly passes False for either permission flag.
+
+        Args:
+            email: The superuser's email address.
+            password: Plain-text password; hashed before storage.
+            **extra_fields: Additional model fields.
+
+        Raises:
+            ValueError: If is_staff or is_superuser is not True.
+        """
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)

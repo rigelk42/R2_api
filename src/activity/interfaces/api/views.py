@@ -18,19 +18,33 @@ from activity.models import Platform
 
 
 class PlatformListView(APIView):
+    """GET /api/me/platforms/ — list all available rideshare platforms."""
+
     permission_classes = [IsAuthenticated]
     http_method_names = ["get"]
 
     def get(self, request):
+        """Return all Platform records."""
         platforms = Platform.objects.all()
         return Response(PlatformSerializer(platforms, many=True).data)
 
 
 class ActivityEntryListCreateView(APIView):
+    """GET/POST /api/me/activity/ — list activity entries or create a new one.
+
+    GET accepts an optional ?month=YYYY-MM query parameter; without it the
+    current calendar month is used.
+    """
+
     permission_classes = [IsAuthenticated]
     http_method_names = ["get", "post"]
 
     def get(self, request):
+        """Return activity entries for the authenticated driver.
+
+        Filters to the month specified by the ?month=YYYY-MM query parameter,
+        defaulting to the current calendar month when the parameter is absent.
+        """
         driver = request.user.driver_profile
         month_param = request.query_params.get("month")
 
@@ -45,6 +59,10 @@ class ActivityEntryListCreateView(APIView):
         return Response(ActivityEntrySerializer(entries, many=True).data)
 
     def post(self, request):
+        """Create a new activity entry for the authenticated driver.
+
+        Returns the created entry with HTTP 201 on success.
+        """
         serializer = ActivityEntryWriteSerializer(
             data=request.data, context={"request": request}
         )
@@ -57,10 +75,17 @@ class ActivityEntryListCreateView(APIView):
 
 
 class ActivityEntryDetailView(APIView):
+    """PATCH/DELETE /api/me/activity/<pk>/ — update or remove a specific activity entry.
+
+    Only entries belonging to the authenticated driver are accessible;
+    attempting to access another driver's entry raises a 404.
+    """
+
     permission_classes = [IsAuthenticated]
     http_method_names = ["patch", "delete"]
 
     def patch(self, request, pk):
+        """Update all fields of the specified activity entry."""
         entry = request.user.driver_profile.activity_entries.get(pk=pk)
         serializer = ActivityEntryWriteSerializer(
             entry, data=request.data, context={"request": request}
@@ -71,6 +96,7 @@ class ActivityEntryDetailView(APIView):
         return Response(ActivityEntrySerializer(entry).data)
 
     def delete(self, request, pk):
+        """Delete the specified activity entry and return HTTP 204."""
         entry = request.user.driver_profile.activity_entries.get(pk=pk)
         DeleteActivityEntry().execute(entry)
 
@@ -78,10 +104,21 @@ class ActivityEntryDetailView(APIView):
 
 
 class MileageEntryListCreateView(APIView):
+    """GET/POST /api/me/mileage/ — list mileage entries or create a new one.
+
+    GET accepts an optional ?month=YYYY-MM query parameter to filter to a
+    specific month; without it all mileage entries are returned.
+    """
+
     permission_classes = [IsAuthenticated]
     http_method_names = ["get", "post"]
 
     def get(self, request):
+        """Return mileage entries for the authenticated driver.
+
+        Filters to the month specified by the ?month=YYYY-MM query parameter
+        when present; otherwise returns all entries.
+        """
         driver = request.user.driver_profile
         month_param = request.query_params.get("month")
 
@@ -92,6 +129,10 @@ class MileageEntryListCreateView(APIView):
         return Response(MileageEntrySerializer(entries, many=True).data)
 
     def post(self, request):
+        """Create a new mileage entry for the authenticated driver.
+
+        Returns the created entry with HTTP 201 on success.
+        """
         serializer = MileageEntryWriteSerializer(
             data=request.data, context={"request": request}
         )
@@ -104,10 +145,17 @@ class MileageEntryListCreateView(APIView):
 
 
 class MileageEntryDetailView(APIView):
+    """PATCH/DELETE /api/me/mileage/<pk>/ — update or remove a specific mileage entry.
+
+    Only entries belonging to the authenticated driver are accessible;
+    attempting to access another driver's entry raises a 404.
+    """
+
     permission_classes = [IsAuthenticated]
     http_method_names = ["patch", "delete"]
 
     def patch(self, request, pk):
+        """Update all fields of the specified mileage entry."""
         entry = request.user.driver_profile.mileage_entries.get(pk=pk)
         serializer = MileageEntryWriteSerializer(
             entry, data=request.data, context={"request": request}
@@ -118,6 +166,7 @@ class MileageEntryDetailView(APIView):
         return Response(MileageEntrySerializer(entry).data)
 
     def delete(self, request, pk):
+        """Delete the specified mileage entry and return HTTP 204."""
         entry = request.user.driver_profile.mileage_entries.get(pk=pk)
         DeleteMileageEntry().execute(entry)
 

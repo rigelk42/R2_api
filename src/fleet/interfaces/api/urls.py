@@ -1,3 +1,5 @@
+"""URL routes for the fleet bounded context."""
+
 from django.urls import path
 
 from fleet.interfaces.api.views import (DriverProfileView, VehicleDetailView,

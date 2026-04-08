@@ -1,3 +1,5 @@
+"""URL routes for the identity bounded context."""
+
 from django.urls import path
 
 from identity.interfaces.api.views import SignupView, UserProfileView

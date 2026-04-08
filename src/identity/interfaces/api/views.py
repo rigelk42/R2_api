@@ -29,9 +29,16 @@ class SignupView(CreateAPIView):
 
 
 class UserProfileView(RetrieveUpdateAPIView):
+    """GET/PATCH /api/me/ — retrieve or update the authenticated user's profile.
+
+    Returns and accepts given_names and surnames. Email is read-only and
+    cannot be changed through this endpoint.
+    """
+
     serializer_class = UpdateUserSerializer
     permission_classes = [IsAuthenticated]
     http_method_names = ["get", "patch"]
 
     def get_object(self):
+        """Return the currently authenticated user as the target object."""
         return self.request.user

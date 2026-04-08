@@ -29,9 +29,16 @@ class SignupSerializer(serializers.Serializer):
 
 
 class UpdateUserSerializer(serializers.Serializer):
+    """Validates and processes profile update input for an existing user.
+
+    Email is exposed as read-only for display purposes and cannot be
+    changed through this serializer. Delegates persistence to UpdateUser.
+    """
+
     email = serializers.EmailField(read_only=True)
     given_names = serializers.CharField()
     surnames = serializers.CharField()
 
     def update(self, instance, validated_data):
+        """Invoke the UpdateUser use case with the validated field values."""
         return UpdateUser().execute(instance, **validated_data)

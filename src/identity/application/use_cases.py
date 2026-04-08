@@ -45,7 +45,22 @@ class RegisterUser:
 
 
 class UpdateUser:
+    """Update the name fields of an existing user account."""
+
     def execute(self, user: CustomUser, given_names: str, surnames: str) -> CustomUser:
+        """Persist updated name fields for the given user.
+
+        Only given_names and surnames are touched; all other fields,
+        including the email and password, are left unchanged.
+
+        Args:
+            user: The CustomUser instance to update.
+            given_names: Replacement given names.
+            surnames: Replacement surnames.
+
+        Returns:
+            The updated CustomUser instance.
+        """
         user.given_names = given_names
         user.surnames = surnames
         user.save(update_fields=["given_names", "surnames"])
