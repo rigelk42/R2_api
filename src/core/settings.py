@@ -1,3 +1,19 @@
+"""Django settings for the R2 API.
+
+Environment variables are loaded from the .env file in the project root via
+django-environ. Secrets (SECRET_KEY, DB_PASSWORD) must be set there; sensible
+defaults are provided for non-secret values so the project runs locally with
+minimal configuration.
+
+Key configuration choices:
+- PostgreSQL is the only supported database backend.
+- JWT authentication via djangorestframework-simplejwt; access tokens expire
+  after 60 minutes.
+- CORS is restricted to origins listed in CORS_ORIGIN_WHITELIST.
+- The custom AUTH_USER_MODEL (identity.CustomUser) uses email as the login
+  identifier instead of a username.
+"""
+
 from datetime import timedelta
 from pathlib import Path
 
@@ -7,8 +23,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(
     DEBUG=(bool, False),
-    ALLOWED_HOSTS=(list, ["127.0.0.1", "localhost",]),
-    CORS_ORIGIN_WHITELIST=(list, ["http://localhost:5173",]),
+    ALLOWED_HOSTS=(
+        list,
+        [
+            "127.0.0.1",
+            "localhost",
+        ],
+    ),
+    CORS_ORIGIN_WHITELIST=(
+        list,
+        [
+            "http://localhost:5173",
+        ],
+    ),
     DB_HOST=(str, "localhost"),
     DB_PORT=(int, 5432),
 )

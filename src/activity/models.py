@@ -4,6 +4,14 @@ from django.db import models
 
 
 class ExpenseCategory(models.TextChoices):
+    """Fixed set of rideshare-related expense categories.
+
+    Used as the choices argument on ExpenseEntry.category. The left-hand
+    value (e.g. "gasoline") is stored in the database; the right-hand
+    string (e.g. "Gasoline") is the human-readable display label returned
+    by get_category_display().
+    """
+
     GASOLINE = "gasoline", "Gasoline"
     VEHICLE_MAINTENANCE = "vehicle_maintenance", "Vehicle Maintenance"
     PARKING = "parking", "Parking"

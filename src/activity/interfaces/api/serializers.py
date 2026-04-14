@@ -164,6 +164,7 @@ class ExpenseEntrySerializer(serializers.Serializer):
     amount = serializers.DecimalField(max_digits=8, decimal_places=2, read_only=True)
 
     def get_category_display(self, obj):
+        """Return the human-readable label for the expense category."""
         return obj.get_category_display()
 
 

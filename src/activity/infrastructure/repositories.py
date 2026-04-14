@@ -38,6 +38,7 @@ class ActivityEntryRepository:
         start: datetime.date,
         end: datetime.date,
     ) -> list[ActivityEntry]:
+        """Return activity entries for a driver within an inclusive date range."""
         return list(
             ActivityEntry.objects.filter(
                 driver_id=driver_id,
