@@ -4,7 +4,7 @@ Each use case class orchestrates domain logic and persistence
 without leaking infrastructure concerns into the domain.
 """
 
-from activity.models import ActivityEntry, MileageEntry
+from activity.models import ActivityEntry, ExpenseEntry, MileageEntry
 
 
 class CreateActivityEntry:
@@ -161,5 +161,76 @@ class DeleteMileageEntry:
 
         Args:
             entry: The MileageEntry instance to delete.
+        """
+        entry.delete()
+
+
+class CreateExpenseEntry:
+    """Create and persist a new ExpenseEntry for a driver."""
+
+    def execute(
+        self, driver, vehicle, date, vendor: str, category: str, amount
+    ) -> ExpenseEntry:
+        """Instantiate and save an ExpenseEntry with the provided attributes.
+
+        Args:
+            driver: The owning Driver.
+            vehicle: The Vehicle the expense is associated with.
+            date: The date the expense was incurred.
+            vendor: Name of the vendor or payee.
+            category: Expense category slug (see ExpenseCategory).
+            amount: Amount paid, in USD.
+
+        Returns:
+            The newly created ExpenseEntry instance.
+        """
+        entry = ExpenseEntry(
+            driver=driver,
+            vehicle=vehicle,
+            date=date,
+            vendor=vendor,
+            category=category,
+            amount=amount,
+        )
+        entry.save()
+        return entry
+
+
+class UpdateExpenseEntry:
+    """Update all mutable fields of an existing ExpenseEntry."""
+
+    def execute(
+        self, entry: ExpenseEntry, vehicle, date, vendor: str, category: str, amount
+    ) -> ExpenseEntry:
+        """Replace all editable fields on the expense entry and persist the change.
+
+        Args:
+            entry: The ExpenseEntry instance to update.
+            vehicle: New or unchanged vehicle.
+            date: New or unchanged expense date.
+            vendor: New or unchanged vendor name.
+            category: New or unchanged category slug.
+            amount: New or unchanged amount paid, in USD.
+
+        Returns:
+            The updated ExpenseEntry instance.
+        """
+        entry.vehicle = vehicle
+        entry.date = date
+        entry.vendor = vendor
+        entry.category = category
+        entry.amount = amount
+        entry.save(update_fields=["vehicle", "date", "vendor", "category", "amount"])
+        return entry
+
+
+class DeleteExpenseEntry:
+    """Delete an ExpenseEntry from the database."""
+
+    def execute(self, entry: ExpenseEntry) -> None:
+        """Remove the expense entry.
+
+        Args:
+            entry: The ExpenseEntry instance to delete.
         """
         entry.delete()

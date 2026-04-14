@@ -8,9 +8,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from activity.application.use_cases import (DeleteActivityEntry,
+                                            DeleteExpenseEntry,
                                             DeleteMileageEntry)
 from activity.interfaces.api.serializers import (ActivityEntrySerializer,
                                                  ActivityEntryWriteSerializer,
+                                                 ExpenseEntrySerializer,
+                                                 ExpenseEntryWriteSerializer,
                                                  MileageEntrySerializer,
                                                  MileageEntryWriteSerializer,
                                                  PlatformSerializer)
@@ -169,5 +172,79 @@ class MileageEntryDetailView(APIView):
         """Delete the specified mileage entry and return HTTP 204."""
         entry = request.user.driver_profile.mileage_entries.get(pk=pk)
         DeleteMileageEntry().execute(entry)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ExpenseEntryListCreateView(APIView):
+    """GET/POST /api/me/expenses/ — list expense entries or create a new one.
+
+    GET accepts an optional ?month=YYYY-MM query parameter; without it the
+    current calendar month is used.
+    """
+
+    permission_classes = [IsAuthenticated]
+    http_method_names = ["get", "post"]
+
+    def get(self, request):
+        """Return expense entries for the authenticated driver.
+
+        Filters to the month specified by the ?month=YYYY-MM query parameter,
+        defaulting to the current calendar month when the parameter is absent.
+        """
+        driver = request.user.driver_profile
+        month_param = request.query_params.get("month")
+
+        if month_param:
+            year, month = (int(part) for part in month_param.split("-"))
+        else:
+            today = date.today()
+            year, month = today.year, today.month
+
+        entries = driver.expense_entries.filter(date__year=year, date__month=month)
+
+        return Response(ExpenseEntrySerializer(entries, many=True).data)
+
+    def post(self, request):
+        """Create a new expense entry for the authenticated driver.
+
+        Returns the created entry with HTTP 201 on success.
+        """
+        serializer = ExpenseEntryWriteSerializer(
+            data=request.data, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+        entry = serializer.save()
+
+        return Response(
+            ExpenseEntrySerializer(entry).data, status=status.HTTP_201_CREATED
+        )
+
+
+class ExpenseEntryDetailView(APIView):
+    """PATCH/DELETE /api/me/expenses/<pk>/ — update or remove a specific expense entry.
+
+    Only entries belonging to the authenticated driver are accessible;
+    attempting to access another driver's entry raises a 404.
+    """
+
+    permission_classes = [IsAuthenticated]
+    http_method_names = ["patch", "delete"]
+
+    def patch(self, request, pk):
+        """Update all fields of the specified expense entry."""
+        entry = request.user.driver_profile.expense_entries.get(pk=pk)
+        serializer = ExpenseEntryWriteSerializer(
+            entry, data=request.data, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+        entry = serializer.save()
+
+        return Response(ExpenseEntrySerializer(entry).data)
+
+    def delete(self, request, pk):
+        """Delete the specified expense entry and return HTTP 204."""
+        entry = request.user.driver_profile.expense_entries.get(pk=pk)
+        DeleteExpenseEntry().execute(entry)
 
         return Response(status=status.HTTP_204_NO_CONTENT)

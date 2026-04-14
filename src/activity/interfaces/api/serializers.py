@@ -3,10 +3,12 @@
 from rest_framework import serializers
 
 from activity.application.use_cases import (CreateActivityEntry,
+                                            CreateExpenseEntry,
                                             CreateMileageEntry,
                                             UpdateActivityEntry,
+                                            UpdateExpenseEntry,
                                             UpdateMileageEntry)
-from activity.models import MileageEntry, Platform
+from activity.models import ExpenseCategory, MileageEntry, Platform
 
 
 class PlatformSerializer(serializers.Serializer):
@@ -147,4 +149,66 @@ class MileageEntryWriteSerializer(serializers.Serializer):
             month=validated_data["month"],
             miles=validated_data["miles"],
             deduction=validated_data["deduction"],
+        )
+
+
+class ExpenseEntrySerializer(serializers.Serializer):
+    """Read-only serializer for displaying expense entry data in API responses."""
+
+    id = serializers.IntegerField(read_only=True)
+    vehicle_id = serializers.IntegerField(read_only=True)
+    date = serializers.DateField(read_only=True)
+    vendor = serializers.CharField(read_only=True)
+    category = serializers.CharField(read_only=True)
+    category_display = serializers.SerializerMethodField()
+    amount = serializers.DecimalField(max_digits=8, decimal_places=2, read_only=True)
+
+    def get_category_display(self, obj):
+        return obj.get_category_display()
+
+
+class ExpenseEntryWriteSerializer(serializers.Serializer):
+    """Validates and processes expense entry create/update input.
+
+    Enforces that the referenced vehicle belongs to the requesting driver.
+    Delegates persistence to CreateExpenseEntry or UpdateExpenseEntry.
+    """
+
+    vehicle_id = serializers.IntegerField()
+    date = serializers.DateField()
+    vendor = serializers.CharField(max_length=128)
+    category = serializers.ChoiceField(choices=ExpenseCategory.choices)
+    amount = serializers.DecimalField(max_digits=8, decimal_places=2)
+
+    def validate(self, data):
+        """Ensure the vehicle belongs to the authenticated driver."""
+        driver = self.context["request"].user.driver_profile
+        if not driver.vehicles.filter(pk=data["vehicle_id"]).exists():
+            raise serializers.ValidationError({"vehicle_id": "Vehicle not found."})
+        return data
+
+    def create(self, validated_data):
+        """Invoke CreateExpenseEntry for the authenticated driver."""
+        driver = self.context["request"].user.driver_profile
+        vehicle = driver.vehicles.get(pk=validated_data["vehicle_id"])
+        return CreateExpenseEntry().execute(
+            driver=driver,
+            vehicle=vehicle,
+            date=validated_data["date"],
+            vendor=validated_data["vendor"],
+            category=validated_data["category"],
+            amount=validated_data["amount"],
+        )
+
+    def update(self, instance, validated_data):
+        """Invoke UpdateExpenseEntry on the existing expense entry instance."""
+        driver = self.context["request"].user.driver_profile
+        vehicle = driver.vehicles.get(pk=validated_data["vehicle_id"])
+        return UpdateExpenseEntry().execute(
+            entry=instance,
+            vehicle=vehicle,
+            date=validated_data["date"],
+            vendor=validated_data["vendor"],
+            category=validated_data["category"],
+            amount=validated_data["amount"],
         )

@@ -1,4 +1,4 @@
-"""ASGI entrypoint for the RidePulse API.
+"""ASGI entrypoint for the R2 API.
 
 Exposes the ASGI callable as ``application`` for use by ASGI servers
 such as Uvicorn or Daphne.

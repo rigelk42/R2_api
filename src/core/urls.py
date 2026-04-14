@@ -1,4 +1,4 @@
-"""Root URL configuration for the RidePulse API.
+"""Root URL configuration for the R2 API.
 
 Mounts the Django admin, JWT token endpoints (obtain / refresh / blacklist),
 and all bounded-context API routes under the /api/ prefix.

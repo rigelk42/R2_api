@@ -1,4 +1,4 @@
-"""WSGI entrypoint for the RidePulse API.
+"""WSGI entrypoint for the R2 API.
 
 Exposes the WSGI callable as ``application`` for use by WSGI servers
 such as Gunicorn.

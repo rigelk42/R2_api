@@ -3,6 +3,19 @@ from decimal import Decimal
 from django.db import models
 
 
+class ExpenseCategory(models.TextChoices):
+    GASOLINE = "gasoline", "Gasoline"
+    VEHICLE_MAINTENANCE = "vehicle_maintenance", "Vehicle Maintenance"
+    PARKING = "parking", "Parking"
+    TOLLS = "tolls", "Tolls"
+    CAR_WASH = "car_wash", "Car Wash / Detailing"
+    PHONE_DATA = "phone_data", "Phone & Data"
+    INSURANCE = "insurance", "Insurance"
+    REGISTRATION = "registration", "Registration & Licensing"
+    ACCESSORIES = "accessories", "Accessories"
+    OTHER = "other", "Other"
+
+
 class Platform(models.Model):
     """A rideshare platform such as Uber or Lyft.
 
@@ -137,3 +150,50 @@ class MileageEntry(models.Model):
     def __str__(self) -> str:
         user = self.driver.user
         return f"{user.surnames}, {user.given_names} - {self.month}"
+
+
+class ExpenseEntry(models.Model):
+    """A single out-of-pocket expense incurred while operating as a driver.
+
+    Captures the date, vendor, category, and amount of an expense. Category
+    is a fixed set of choices (see ExpenseCategory) covering the most common
+    rideshare-related costs. Only one instance of this model has no uniqueness
+    constraint across fields — a driver may have multiple expenses of the same
+    category on the same day (e.g. two toll charges).
+
+    Currency amounts are in USD.
+    """
+
+    driver = models.ForeignKey(
+        "fleet.Driver",
+        on_delete=models.CASCADE,
+        related_name="expense_entries",
+    )
+    vehicle = models.ForeignKey(
+        "fleet.Vehicle",
+        on_delete=models.CASCADE,
+        related_name="expense_entries",
+    )
+    date = models.DateField(help_text="Date the expense was incurred.")
+    vendor = models.CharField(
+        max_length=128,
+        help_text="Name of the vendor or payee.",
+    )
+    category = models.CharField(
+        max_length=32,
+        choices=ExpenseCategory.choices,
+        help_text="Expense category.",
+    )
+    amount = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        help_text="Amount paid, in USD.",
+    )
+
+    def __str__(self) -> str:
+        user = self.driver.user
+        return (
+            f"{user.surnames}, {user.given_names}"
+            f" - {self.get_category_display()}"
+            f" - {self.date}"
+        )
