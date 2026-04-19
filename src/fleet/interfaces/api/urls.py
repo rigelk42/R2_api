@@ -2,8 +2,11 @@
 
 from django.urls import path
 
-from fleet.interfaces.api.views import (DriverProfileView, VehicleDetailView,
-                                        VehicleListCreateView)
+from fleet.interfaces.api.views import (
+    DriverProfileView,
+    VehicleDetailView,
+    VehicleListCreateView,
+)
 
 urlpatterns = [
     path("me/driver-profile/", DriverProfileView.as_view(), name="driver-profile"),

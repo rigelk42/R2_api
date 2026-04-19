@@ -1,13 +1,16 @@
 """API views for the fleet bounded context."""
 
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView, Response
 
-from fleet.interfaces.api.serializers import (DriverProfileSerializer,
-                                              VehicleSerializer,
-                                              VehicleWriteSerializer)
+from fleet.interfaces.api.serializers import (
+    DriverProfileSerializer,
+    VehicleSerializer,
+    VehicleWriteSerializer,
+)
 
 
 class DriverProfileView(RetrieveUpdateAPIView):
@@ -66,7 +69,7 @@ class VehicleDetailView(APIView):
 
     def patch(self, request, pk):
         """Update all fields of the specified vehicle."""
-        vehicle = request.user.driver_profile.vehicles.get(pk=pk)
+        vehicle = get_object_or_404(request.user.driver_profile.vehicles, pk=pk)
         serializer = VehicleWriteSerializer(
             vehicle, data=request.data, context={"request": request}
         )
@@ -77,7 +80,7 @@ class VehicleDetailView(APIView):
 
     def delete(self, request, pk):
         """Delete the specified vehicle and return HTTP 204."""
-        vehicle = request.user.driver_profile.vehicles.get(pk=pk)
+        vehicle = get_object_or_404(request.user.driver_profile.vehicles, pk=pk)
         vehicle.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)

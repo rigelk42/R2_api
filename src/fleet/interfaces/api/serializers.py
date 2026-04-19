@@ -2,8 +2,11 @@
 
 from rest_framework import serializers
 
-from fleet.application.use_cases import (CreateVehicle, UpdateDriverProfile,
-                                         UpdateVehicle)
+from fleet.application.use_cases import (
+    CreateVehicle,
+    UpdateDriverProfile,
+    UpdateVehicle,
+)
 
 
 class DriverProfileSerializer(serializers.Serializer):
@@ -17,10 +20,10 @@ class DriverProfileSerializer(serializers.Serializer):
     driver_license_state = serializers.CharField(allow_blank=True)
 
     def validate(self, data):
-        """Ensure license number and issuing state are provided together or not at all."""
+        """Ensure license number and state are provided together or not at all."""
         if bool(data.get("driver_license")) != bool(data.get("driver_license_state")):
             raise serializers.ValidationError(
-                "Driver license and driver license state must both be provided or both empty"
+                "Driver license and license state must both be provided or both empty"
             )
 
         return data
@@ -59,10 +62,10 @@ class VehicleWriteSerializer(serializers.Serializer):
     license_plate_state = serializers.CharField(allow_blank=True)
 
     def validate(self, data):
-        """Ensure license plate and issuing state are provided together or not at all."""
+        """Ensure license plate and state are provided together or not at all."""
         if bool(data.get("license_plate")) != bool(data.get("license_plate_state")):
             raise serializers.ValidationError(
-                "License plate and license plate state must both be provided or both empty"
+                "License plate and plate state must both be provided or both empty"
             )
 
         return data

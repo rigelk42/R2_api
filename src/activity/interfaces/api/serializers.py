@@ -2,12 +2,14 @@
 
 from rest_framework import serializers
 
-from activity.application.use_cases import (CreateActivityEntry,
-                                            CreateExpenseEntry,
-                                            CreateMileageEntry,
-                                            UpdateActivityEntry,
-                                            UpdateExpenseEntry,
-                                            UpdateMileageEntry)
+from activity.application.use_cases import (
+    CreateActivityEntry,
+    CreateExpenseEntry,
+    CreateMileageEntry,
+    UpdateActivityEntry,
+    UpdateExpenseEntry,
+    UpdateMileageEntry,
+)
 from activity.models import ExpenseCategory, MileageEntry, Platform
 
 

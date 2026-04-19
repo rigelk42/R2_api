@@ -2,21 +2,26 @@
 
 from datetime import date
 
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from activity.application.use_cases import (DeleteActivityEntry,
-                                            DeleteExpenseEntry,
-                                            DeleteMileageEntry)
-from activity.interfaces.api.serializers import (ActivityEntrySerializer,
-                                                 ActivityEntryWriteSerializer,
-                                                 ExpenseEntrySerializer,
-                                                 ExpenseEntryWriteSerializer,
-                                                 MileageEntrySerializer,
-                                                 MileageEntryWriteSerializer,
-                                                 PlatformSerializer)
+from activity.application.use_cases import (
+    DeleteActivityEntry,
+    DeleteExpenseEntry,
+    DeleteMileageEntry,
+)
+from activity.interfaces.api.serializers import (
+    ActivityEntrySerializer,
+    ActivityEntryWriteSerializer,
+    ExpenseEntrySerializer,
+    ExpenseEntryWriteSerializer,
+    MileageEntrySerializer,
+    MileageEntryWriteSerializer,
+    PlatformSerializer,
+)
 from activity.models import Platform
 
 
@@ -52,7 +57,13 @@ class ActivityEntryListCreateView(APIView):
         month_param = request.query_params.get("month")
 
         if month_param:
-            year, month = (int(part) for part in month_param.split("-"))
+            try:
+                year, month = (int(part) for part in month_param.split("-"))
+            except (ValueError, TypeError):
+                return Response(
+                    {"detail": "Invalid month format. Use YYYY-MM."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         else:
             today = date.today()
             year, month = today.year, today.month
@@ -89,7 +100,7 @@ class ActivityEntryDetailView(APIView):
 
     def patch(self, request, pk):
         """Update all fields of the specified activity entry."""
-        entry = request.user.driver_profile.activity_entries.get(pk=pk)
+        entry = get_object_or_404(request.user.driver_profile.activity_entries, pk=pk)
         serializer = ActivityEntryWriteSerializer(
             entry, data=request.data, context={"request": request}
         )
@@ -100,7 +111,7 @@ class ActivityEntryDetailView(APIView):
 
     def delete(self, request, pk):
         """Delete the specified activity entry and return HTTP 204."""
-        entry = request.user.driver_profile.activity_entries.get(pk=pk)
+        entry = get_object_or_404(request.user.driver_profile.activity_entries, pk=pk)
         DeleteActivityEntry().execute(entry)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -159,7 +170,7 @@ class MileageEntryDetailView(APIView):
 
     def patch(self, request, pk):
         """Update all fields of the specified mileage entry."""
-        entry = request.user.driver_profile.mileage_entries.get(pk=pk)
+        entry = get_object_or_404(request.user.driver_profile.mileage_entries, pk=pk)
         serializer = MileageEntryWriteSerializer(
             entry, data=request.data, context={"request": request}
         )
@@ -170,7 +181,7 @@ class MileageEntryDetailView(APIView):
 
     def delete(self, request, pk):
         """Delete the specified mileage entry and return HTTP 204."""
-        entry = request.user.driver_profile.mileage_entries.get(pk=pk)
+        entry = get_object_or_404(request.user.driver_profile.mileage_entries, pk=pk)
         DeleteMileageEntry().execute(entry)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -196,7 +207,13 @@ class ExpenseEntryListCreateView(APIView):
         month_param = request.query_params.get("month")
 
         if month_param:
-            year, month = (int(part) for part in month_param.split("-"))
+            try:
+                year, month = (int(part) for part in month_param.split("-"))
+            except (ValueError, TypeError):
+                return Response(
+                    {"detail": "Invalid month format. Use YYYY-MM."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         else:
             today = date.today()
             year, month = today.year, today.month
@@ -233,7 +250,7 @@ class ExpenseEntryDetailView(APIView):
 
     def patch(self, request, pk):
         """Update all fields of the specified expense entry."""
-        entry = request.user.driver_profile.expense_entries.get(pk=pk)
+        entry = get_object_or_404(request.user.driver_profile.expense_entries, pk=pk)
         serializer = ExpenseEntryWriteSerializer(
             entry, data=request.data, context={"request": request}
         )
@@ -244,7 +261,7 @@ class ExpenseEntryDetailView(APIView):
 
     def delete(self, request, pk):
         """Delete the specified expense entry and return HTTP 204."""
-        entry = request.user.driver_profile.expense_entries.get(pk=pk)
+        entry = get_object_or_404(request.user.driver_profile.expense_entries, pk=pk)
         DeleteExpenseEntry().execute(entry)
 
         return Response(status=status.HTTP_204_NO_CONTENT)

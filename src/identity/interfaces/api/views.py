@@ -4,9 +4,18 @@ from rest_framework import status
 from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
+from rest_framework_simplejwt.views import TokenObtainPairView
 
-from identity.interfaces.api.serializers import (SignupSerializer,
-                                                 UpdateUserSerializer)
+from identity.interfaces.api.serializers import SignupSerializer, UpdateUserSerializer
+
+
+class LoginRateThrottle(AnonRateThrottle):
+    scope = "login"
+
+
+class ThrottledTokenObtainPairView(TokenObtainPairView):
+    throttle_classes = [LoginRateThrottle]
 
 
 class SignupView(CreateAPIView):
@@ -19,6 +28,7 @@ class SignupView(CreateAPIView):
 
     serializer_class = SignupSerializer
     permission_classes = [AllowAny]
+    throttle_classes = [LoginRateThrottle]
 
     def create(self, request, *args, **kwargs):
         """Validate the payload, create the user, and return a success message."""

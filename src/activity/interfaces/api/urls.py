@@ -2,13 +2,15 @@
 
 from django.urls import path
 
-from activity.interfaces.api.views import (ActivityEntryDetailView,
-                                           ActivityEntryListCreateView,
-                                           ExpenseEntryDetailView,
-                                           ExpenseEntryListCreateView,
-                                           MileageEntryDetailView,
-                                           MileageEntryListCreateView,
-                                           PlatformListView)
+from activity.interfaces.api.views import (
+    ActivityEntryDetailView,
+    ActivityEntryListCreateView,
+    ExpenseEntryDetailView,
+    ExpenseEntryListCreateView,
+    MileageEntryDetailView,
+    MileageEntryListCreateView,
+    PlatformListView,
+)
 
 urlpatterns = [
     path("me/platforms/", PlatformListView.as_view(), name="platforms"),
