@@ -59,7 +59,7 @@ class ActivityEntryListCreateView(APIView):
         if month_param:
             try:
                 year, month = (int(part) for part in month_param.split("-"))
-            except (ValueError, TypeError):
+            except ValueError, TypeError:
                 return Response(
                     {"detail": "Invalid month format. Use YYYY-MM."},
                     status=status.HTTP_400_BAD_REQUEST,
@@ -209,7 +209,7 @@ class ExpenseEntryListCreateView(APIView):
         if month_param:
             try:
                 year, month = (int(part) for part in month_param.split("-"))
-            except (ValueError, TypeError):
+            except ValueError, TypeError:
                 return Response(
                     {"detail": "Invalid month format. Use YYYY-MM."},
                     status=status.HTTP_400_BAD_REQUEST,
